@@ -4,42 +4,57 @@
       <b-row cols="1">
         <b-col>
           <b-card>
-            <b-card-text>
-              <h2 class="card-title">Surgical Tech Dashboard</h2>
-            </b-card-text>
+            <b-card-text> <h2 class="card-title">Surgical Tech Dashboard</h2> </b-card-text>
+          </b-card>
+        </b-col>
+      </b-row>
+      <b-row cols="1">
+        <b-col>
+          <b-card>
+            <b-card-text> <h4 class="card-title">Simulation Functions</h4> </b-card-text>
+
+            <b-row cols="3">
+              <b-col>
+                <button @click="simulateIncident" type="button" class="btn btn-warning">Simulate Incident</button>
+              </b-col>
+              <b-col>
+                <button @click="simulateError" type="button" class="btn btn-danger">Simulate Error</button>
+              </b-col>
+              <b-col>
+                <button @click="simulateSuccess" type="button" class="btn btn-success">Simulate Success</button>
+              </b-col>
+            </b-row>
           </b-card>
         </b-col>
       </b-row>
       <b-row cols-md="2" cols-lg="3">
         <b-col>
-          <b-card title="Open alerts">
-            <h2 class="card-title">4 pcs</h2>
-          </b-card>
-          <b-card title="line chart"><LineChart :chartData="barData" :options="lineOptions" /></b-card>
-          <b-card><BarChart :chartData="mixedData" :options="barOptions" /></b-card>
+          <card :title="`Open alerts`" :text-large="`4 pcs`"></card>
+          <card :title="`Status of Room 1`" :text="`Ready to use`" :items="roomStatus.room1"></card>
+          <b-card title="line chart"><LineChart :chartData="dataBar" :options="lineOptions" /></b-card>
+          <b-card><BarChart :chartData="dataMixed" :options="barOptions" /></b-card>
         </b-col>
         <b-col>
-          <list :items="dangers"> text</list>
-          <list> </list>
-          <b-card><BarChart :chartData="barData" :options="horizontalOptions" /></b-card>
-          <b-card><DoughnutChart :chartData="doughtnutData" :options="pieOptions" /></b-card>
-          <b-card title="Card Title">
-            <b-card-text>
-              Some quick example text to build on the card title and make up the bulk of the card's content.
-            </b-card-text>
-          </b-card>
+          <card :title="`Status of Room 2`" :text="`Unavailable`" :items="roomStatus.room2"></card>
+          <b-card><BarChart :chartData="dataBar" :options="horizontalOptions" /></b-card>
+          <b-card><DoughnutChart :chartData="dataDoughtnut" :options="pieOptions" /></b-card>
+
+          <card
+            :title="`Card Title`"
+            :text="`Some quick example text to build on the card title and make up the bulk of the card's content.`"
+          >
+          </card>
         </b-col>
         <b-col>
-          <b-card title="Resolved incidents">
-            <h2 class="card-title">349 pcs</h2>
-          </b-card>
-          <b-card><PieChart :chartData="pieData" :options="pieOptions" /></b-card>
-          <b-card title="Card Title">
-            <b-card-text>
-              Some quick example text to build on the card title and make up the bulk of the card's content.
-            </b-card-text>
-          </b-card>
-          <b-card><LineChart :chartData="mixedData" :options="lineOptions" /></b-card>
+          <card :title="`Status of Room 3`" :text="`Unavailable`" :items="roomStatus.room3"></card>
+          <card :title="`Resolved incidents`" :text-large="`349 pcs`"></card>
+          <b-card><PieChart :chartData="dataPie" :options="pieOptions" /></b-card>
+          <card
+            :title="`Card Title`"
+            :text="`Some quick example text to build on the card title and make up the bulk of the card's content.`"
+          >
+          </card>
+          <b-card><LineChart :chartData="dataMixed" :options="lineOptions" /></b-card>
         </b-col>
       </b-row>
     </b-container>
@@ -51,11 +66,15 @@ import LineChart from './components/LineChart.vue'
 import BarChart from './components/BarChart.vue'
 import PieChart from './components/PieChart.vue'
 import DoughnutChart from './components/DoughnutChart.vue'
-import BarData from './assets/bar.json'
-import PieData from './assets/pie.json'
-import MixedData from './assets/mixed.json'
-import DoughnutData from './assets/doughnut.json'
 import List from './components/List.vue'
+import Card from './components/Card.vue'
+import FileBar from './assets/bar.json'
+import FilePie from './assets/pie.json'
+import FileMixed from './assets/mixed.json'
+import FileDoughnut from './assets/doughnut.json'
+import FileStatusOk from './assets/status-ok.json'
+import FileStatusFail from './assets/status-fail.json'
+import FileStatusMixed from './assets/status-mixed.json'
 
 export default {
   name: 'App',
@@ -64,15 +83,28 @@ export default {
     BarChart,
     DoughnutChart,
     PieChart,
-    List
+    List,
+    Card
   },
   data() {
     return {
-      barData: BarData,
-      pieData: PieData,
-      mixedData: MixedData,
-      doughtnutData: DoughnutData,
-      dangers: [{ text: 'one' }, { text: 'two' }],
+      dataBar: FileBar,
+      dataPie: FilePie,
+      dataMixed: FileMixed,
+      dataDoughtnut: FileDoughnut,
+      simuStatus: 'success',
+      roomStatus: {
+        room1: [],
+        room2: [],
+        room3: []
+      },
+      dataStatusMixed: FileStatusMixed,
+      /*[
+        { text: 'one', type: 'danger' },
+        { text: 'two', type: 'info' },
+        { text: 'three', type: 'success' },
+        { text: 'four', type: 'warning' }
+      ]*/
       lineOptions: {
         title: {
           display: true,
@@ -154,7 +186,30 @@ export default {
     this.fillData()
   },
   methods: {
-    fillData() {}
+    fillData() {
+      if (this.simuStatus === 'error') {
+        this.roomStatus.room2 = FileStatusFail
+      } else if (this.simuStatus === 'incident') {
+        this.roomStatus.room1 = FileStatusFail
+        this.roomStatus.room3 = FileStatusMixed
+      } else {
+        this.roomStatus.room1 = FileStatusOk
+        this.roomStatus.room2 = FileStatusOk
+        this.roomStatus.room3 = FileStatusOk
+      }
+    },
+    simulateError() {
+      this.simuStatus = 'error'
+      this.fillData()
+    },
+    simulateSuccess() {
+      this.simuStatus = 'success'
+      this.fillData()
+    },
+    simulateIncident() {
+      this.simuStatus = 'incident'
+      this.fillData()
+    }
   }
 }
 </script>

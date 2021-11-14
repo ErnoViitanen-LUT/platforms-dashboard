@@ -1,0 +1,14 @@
+[{
+      "text": "Surgical Equipment",
+      "type": "danger"
+   },
+   {
+      "text": "Sanitation",
+      "type": "success"
+   },
+
+   {
+      "text": "Other",
+      "type": "warning"
+   }
+]
