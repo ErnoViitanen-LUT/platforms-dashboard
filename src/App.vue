@@ -6,8 +6,8 @@
           <b-card>
             <b-card-text>
               <h2 class="card-title">Surgical Tech Dashboard</h2>
-            </b-card-text></b-card
-          >
+            </b-card-text>
+          </b-card>
         </b-col>
       </b-row>
       <b-row cols-md="2" cols-lg="3">
@@ -19,11 +19,8 @@
           <b-card><BarChart :chartData="mixedData" :options="barOptions" /></b-card>
         </b-col>
         <b-col>
-          <b-card title="Card Title">
-            <b-card-text>
-              Some quick example text to build on the card title and make up the bulk of the card's content.
-            </b-card-text>
-          </b-card>
+          <list :items="dangers"> text</list>
+          <list> </list>
           <b-card><BarChart :chartData="barData" :options="horizontalOptions" /></b-card>
           <b-card><DoughnutChart :chartData="doughtnutData" :options="pieOptions" /></b-card>
           <b-card title="Card Title">
@@ -58,6 +55,7 @@ import BarData from './assets/bar.json'
 import PieData from './assets/pie.json'
 import MixedData from './assets/mixed.json'
 import DoughnutData from './assets/doughnut.json'
+import List from './components/List.vue'
 
 export default {
   name: 'App',
@@ -65,7 +63,8 @@ export default {
     LineChart,
     BarChart,
     DoughnutChart,
-    PieChart
+    PieChart,
+    List
   },
   data() {
     return {
@@ -73,7 +72,7 @@ export default {
       pieData: PieData,
       mixedData: MixedData,
       doughtnutData: DoughnutData,
-
+      dangers: [{ text: 'one' }, { text: 'two' }],
       lineOptions: {
         title: {
           display: true,
