@@ -9,10 +9,10 @@
         :key="item.text"
         class="d-flex justify-content-between align-items-center"
       >
-        <b-icon v-if="item.type === 'danger'" icon="x-square-fill" scale="1.5" variant="danger"></b-icon>
-        <b-icon v-else-if="item.type === 'success'" icon="check-square" scale="1.5" variant="success"></b-icon>
+        <b-icon v-if="item.status === 'danger'" icon="x-square-fill" scale="1.5" variant="danger"></b-icon>
+        <b-icon v-else-if="item.status === 'success'" icon="check-square" scale="1.5" variant="success"></b-icon>
         <b-icon
-          v-else-if="item.type === 'warning'"
+          v-else-if="item.status === 'warning'"
           icon="exclamation-triangle-fill"
           scale="1.5"
           variant="warning"

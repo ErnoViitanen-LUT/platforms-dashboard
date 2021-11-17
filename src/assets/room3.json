@@ -1,0 +1,43 @@
+{
+   "name": "Room 3",
+   "statustext": "",
+   "statuslist": [{
+         "text": "Surgical Technology",
+         "status": "success"
+      },
+      {
+         "text": "Surgical Equipment",
+         "status": "success"
+      },
+      {
+         "text": "Sanitation",
+         "status": "success"
+      },
+      {
+         "text": "Latency",
+         "status": "warning"
+      }
+   ],
+   "latency": {
+      "labels": [
+         "Alphta1",
+         "Bravo2",
+         "Omega3",
+         "Charlie4",
+         "Delta5",
+         "Echo6",
+         "Zeta7"
+      ],
+      "data": [50, 50, 50, 50, 60, 70, 80]
+   },
+   "device": {
+      "active": 4,
+      "total": 12,
+      "list": [{
+         "name": "Device 1"
+
+      }]
+   }
+
+
+}

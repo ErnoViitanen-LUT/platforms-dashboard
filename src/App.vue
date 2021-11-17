@@ -8,6 +8,15 @@
           </b-card>
         </b-col>
       </b-row>
+      <b-row cols="2">
+        <b-col>
+          <card :title="`Open alerts`" :text-large="openAlerts"></card>
+        </b-col>
+        <b-col>
+          <card :title="`Resolved incidents`" :text-large="resolvedIncidents"></card>
+        </b-col>
+      </b-row>
+
       <b-row cols="1">
         <b-col>
           <b-card>
@@ -29,13 +38,12 @@
       </b-row>
       <b-row cols-md="2" cols-lg="3">
         <b-col>
-          <card :title="`Open alerts`" :text-large="`4 pcs`"></card>
-          <card :title="`Status of Room 1`" :text="`Ready to use`" :items="roomStatus.room1"></card>
+          <card v-if="rooms[0]" :title="`Status of Room 1`" :text="status1" :items="rooms[0].statuslist"></card>
           <b-card title="line chart"><LineChart :chartData="dataBar" :options="lineOptions" /></b-card>
           <b-card><BarChart :chartData="dataMixed" :options="barOptions" /></b-card>
         </b-col>
         <b-col>
-          <card :title="`Status of Room 2`" :text="`Unavailable`" :items="roomStatus.room2"></card>
+          <card v-if="rooms[1]" :title="`Status of Room 2`" :text="status2" :items="rooms[1].statuslist"></card>
           <b-card><BarChart :chartData="dataBar" :options="horizontalOptions" /></b-card>
           <b-card><DoughnutChart :chartData="dataDoughtnut" :options="pieOptions" /></b-card>
 
@@ -46,8 +54,7 @@
           </card>
         </b-col>
         <b-col>
-          <card :title="`Status of Room 3`" :text="`Unavailable`" :items="roomStatus.room3"></card>
-          <card :title="`Resolved incidents`" :text-large="`349 pcs`"></card>
+          <card v-if="rooms[2]" :title="`Status of Room 3`" :text="status3" :items="rooms[2].statuslist"></card>
           <b-card><PieChart :chartData="dataPie" :options="pieOptions" /></b-card>
           <card
             :title="`Card Title`"
@@ -75,6 +82,9 @@ import FileDoughnut from './assets/doughnut.json'
 import FileStatusOk from './assets/status-ok.json'
 import FileStatusFail from './assets/status-fail.json'
 import FileStatusMixed from './assets/status-mixed.json'
+import FileRoom1 from './assets/room1.json'
+import FileRoom2 from './assets/room2.json'
+import FileRoom3 from './assets/room3.json'
 
 export default {
   name: 'App',
@@ -93,11 +103,9 @@ export default {
       dataMixed: FileMixed,
       dataDoughtnut: FileDoughnut,
       simuStatus: 'success',
-      roomStatus: {
-        room1: [],
-        room2: [],
-        room3: []
-      },
+      rooms: [],
+      resolvedIncidentsCount: 0,
+      isSimulating: false,
       dataStatusMixed: FileStatusMixed,
       /*[
         { text: 'one', type: 'danger' },
@@ -180,35 +188,80 @@ export default {
   computed: {
     mobile() {
       return this.$vuetify.breakpoint.sm
+    },
+    status1() {
+      return this.getStatusText(this.rooms[0])
+    },
+    status2() {
+      return this.getStatusText(this.rooms[1])
+    },
+    status3() {
+      return this.getStatusText(this.rooms[2])
+    },
+    openAlerts() {
+      let total = 0
+      this.rooms.forEach((room) => {
+        total += room.statuslist.filter((status) => status.status !== 'success').length
+      })
+      return total + ' pcs'
+    },
+    resolvedIncidents() {
+      return this.resolvedIncidentsCount + ' pcs'
     }
   },
   mounted() {
     this.fillData()
   },
   methods: {
-    fillData() {
-      if (this.simuStatus === 'error') {
-        this.roomStatus.room2 = FileStatusFail
-      } else if (this.simuStatus === 'incident') {
-        this.roomStatus.room1 = FileStatusFail
-        this.roomStatus.room3 = FileStatusMixed
-      } else {
-        this.roomStatus.room1 = FileStatusOk
-        this.roomStatus.room2 = FileStatusOk
-        this.roomStatus.room3 = FileStatusOk
+    getStatusText(room) {
+      let statustext = ''
+      if (room) {
+        const roomStatus = room.statuslist.find(({ status }) => status !== 'success')
+        if (roomStatus == undefined) statustext = 'Ready to use'
+        else {
+          statustext = 'Unavailable'
+        }
       }
+      return statustext
+    },
+    simulateRandom() {
+      let i = Math.floor(Math.random() * 3)
+      let j = Math.floor(Math.random() * 3)
+      let k = Math.floor(Math.random() * 3)
+
+      this.rooms[i].statuslist[j].status = ['danger', 'success', 'warning'][k]
+      if (this.rooms[i].statuslist[j].status === 'success') this.resolvedIncidentsCount++
+      if (this.isSimulating) setTimeout(this.simulateRandom, 300)
+    },
+    fillData() {
+      this.rooms = []
+      this.rooms.push(FileRoom1)
+      this.rooms.push(FileRoom2)
+      this.rooms.push(FileRoom3)
     },
     simulateError() {
-      this.simuStatus = 'error'
-      this.fillData()
+      this.isSimulating = false
+
+      let i = Math.floor(Math.random() * 3)
+      let j = Math.floor(Math.random() * 3)
+
+      const roomStatus = this.rooms[i].statuslist.find(({ status }) => status !== 'danger')
+      if (roomStatus) roomStatus.status = 'danger'
     },
     simulateSuccess() {
-      this.simuStatus = 'success'
-      this.fillData()
+      this.isSimulating = false
+      this.rooms.forEach((room) => {
+        room.statuslist
+          .filter((status) => status.status !== 'success')
+          .forEach((status) => {
+            status.status = 'success'
+            this.resolvedIncidentsCount++
+          })
+      })
     },
     simulateIncident() {
-      this.simuStatus = 'incident'
-      this.fillData()
+      this.isSimulating = !this.isSimulating
+      this.simulateRandom()
     }
   }
 }
