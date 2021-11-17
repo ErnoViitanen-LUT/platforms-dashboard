@@ -1,24 +1,46 @@
 # platforms-dashboard
 
-## Project setup
+## Project usage
+
 ```
 yarn install
-```
-
-### Compiles and hot-reloads for development
-```
 yarn serve
-```
-
-### Compiles and minifies for production
-```
 yarn build
+yarn deploy
 ```
 
-### Lints and fixes files
-```
-yarn lint
+### Build
+
+- yarn build
+
+### Deploy
+
+- setup package.json with project details
+
+```json
+{
+   "scripts": {
+      "serve": "vue-cli-service serve",
+      "build": "vue-cli-service build",
+      "lint": "vue-cli-service lint",
+      "deploy": "gh-pages -d dist"
+   },
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/ErnoViitanen-LUT/platforms-dashboard.git"
+   },
+   "author": "",
+   "license": "ISC",
+   "bugs": {
+      "url": "https://github.com/ErnoViitanen-LUT/platforms-dashboard/issues"
+   },
+   "homepage": "https://ernoviitanen-lut.github.io/platforms-dashboard/"
+}
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- yarn add gh-pages
+- yarn deploy
+
+### Run
+
+<https://ernoviitanen-lut.github.io/platforms-dashboard/>
