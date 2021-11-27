@@ -18,26 +18,32 @@
          "status": "warning"
       }
    ],
-   "latency": {
-      "labels": [
-         "Alphta1",
-         "Bravo2",
-         "Omega3",
-         "Charlie4",
-         "Delta5",
-         "Echo6",
-         "Zeta7"
-      ],
-      "data": [50, 50, 50, 50, 60, 70, 80]
-   },
-   "device": {
-      "active": 4,
-      "total": 12,
-      "list": [{
-         "name": "Device 1"
-
-      }]
-   }
+   "dailyUsage": 40.345,
+   "latency": [73, 55, 30, 74, 18, 48, 11, 26, 61, 10, 51, 15, 57, 17, 79, 63, 42, 53, 24, 29],
+   "powerConsumption": [1.3, 0.9, 1.2, 0.4, 0.2, 0.4, 0.2],
+   "monthlyUsage": [4239, 3920, 4548, 5123, 3259, 4138, 353, 4548, 5123, 3920, 10],
+   "activeDevices": 5,
+   "devices": [{
+         "name": "Electrocardiograph",
+         "maintenanceHours": 642
+      },
+      {
+         "name": "Operating Table",
+         "maintenanceHours": 108
+      },
+      {
+         "name": "Syringe Pump",
+         "maintenanceHours": 844
+      },
+      {
+         "name": "Suction Pump",
+         "maintenanceHours": 761
+      },
+      {
+         "name": "Defibrillator",
+         "maintenanceHours": 302
+      }
+   ]
 
 
 }

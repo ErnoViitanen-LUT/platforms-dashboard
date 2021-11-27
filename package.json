@@ -22,7 +22,7 @@
     "@kurkle/color": "^0.1.9",
     "bootstrap": "^5.1.3",
     "bootstrap-vue": "^2.21.2",
-    "chart.js": "2",
+    "chart.js": "2.9.4",
     "chartjs-adapter-luxon": "^1.1.0",
     "core-js": "^3.6.5",
     "gh-pages": "^3.2.3",

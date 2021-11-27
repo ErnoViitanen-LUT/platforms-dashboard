@@ -4,24 +4,6 @@
       <b-row cols="1">
         <b-col>
           <b-card>
-            <b-card-text> <h2 class="card-title">Surgical Tech Dashboard</h2> </b-card-text>
-          </b-card>
-        </b-col>
-      </b-row>
-      <b-row cols="2">
-        <b-col>
-          <card :title="`Open alerts`" :text-large="openAlerts"></card>
-        </b-col>
-        <b-col>
-          <card :title="`Resolved incidents`" :text-large="resolvedIncidents"></card>
-        </b-col>
-      </b-row>
-
-      <b-row cols="1">
-        <b-col>
-          <b-card>
-            <b-card-text> <h4 class="card-title">Simulation Functions</h4> </b-card-text>
-
             <b-row cols="3">
               <b-col>
                 <button @click="simulateIncident" type="button" class="btn btn-warning">Simulate Incident</button>
@@ -36,33 +18,55 @@
           </b-card>
         </b-col>
       </b-row>
-      <b-row cols-md="2" cols-lg="3">
+      <b-row lg="1">
         <b-col>
+          <b-card>
+            <b-card-text> <h2 class="card-title">Surgical Tech Dashboard</h2> </b-card-text>
+          </b-card>
+        </b-col>
+      </b-row>
+      <b-row cols="2">
+        <b-col>
+          <card :title="`Open alerts`" :text-large="openAlerts"></card>
+        </b-col>
+        <b-col>
+          <card :title="`Completed tasks`" :text-large="completedTasks"></card>
+        </b-col>
+      </b-row>
+
+      <b-row>
+        <b-col md="6" lg="4">
           <card v-if="rooms[0]" :title="`Status of Room 1`" :text="status1" :items="rooms[0].statuslist"></card>
-          <b-card title="line chart"><LineChart :chartData="dataBar" :options="lineOptions" /></b-card>
-          <b-card><BarChart :chartData="dataMixed" :options="barOptions" /></b-card>
         </b-col>
         <b-col>
           <card v-if="rooms[1]" :title="`Status of Room 2`" :text="status2" :items="rooms[1].statuslist"></card>
-          <b-card><BarChart :chartData="dataBar" :options="horizontalOptions" /></b-card>
-          <b-card><DoughnutChart :chartData="dataDoughtnut" :options="pieOptions" /></b-card>
-
-          <card
-            :title="`Card Title`"
-            :text="`Some quick example text to build on the card title and make up the bulk of the card's content.`"
-          >
-          </card>
         </b-col>
         <b-col>
           <card v-if="rooms[2]" :title="`Status of Room 3`" :text="status3" :items="rooms[2].statuslist"></card>
-          <b-card><PieChart :chartData="dataPie" :options="pieOptions" /></b-card>
-          <card
-            :title="`Card Title`"
-            :text="`Some quick example text to build on the card title and make up the bulk of the card's content.`"
-          >
-          </card>
-          <b-card><LineChart :chartData="dataMixed" :options="lineOptions" /></b-card>
         </b-col>
+      </b-row>
+      <b-row cols-md="1" cols-lg="2">
+        <b-col md="12" lg="4">
+          <b-card title="Active Devices (#)"
+            ><doughnutChart :chartData="activeDevicesData" :options="activeDevicesOptions"
+          /></b-card>
+        </b-col>
+        <b-col md="12" lg="8">
+          <b-card title="Latency (ms)"><LineChart :chartData="latencyData" :options="latencyOptions" /></b-card>
+        </b-col>
+      </b-row>
+      <b-row cols-md="1" cols-lg="2">
+        <b-col md="12" lg="4">
+          <b-card title="Power Consumption (kWh)"
+            ><BarChart :chartData="powerConsumptionData" :options="powerConsumptionOptions"
+          /></b-card>
+        </b-col>
+        <b-col md="12" lg="8">
+          <b-card title="Maintenance Hours"
+            ><BarChart :chartData="maintenanceData" :options="maintenanceOptions"
+          /></b-card>
+        </b-col>
+        <b-col> </b-col>
       </b-row>
     </b-container>
   </div>
@@ -75,13 +79,6 @@ import PieChart from './components/PieChart.vue'
 import DoughnutChart from './components/DoughnutChart.vue'
 import List from './components/List.vue'
 import Card from './components/Card.vue'
-import FileBar from './assets/bar.json'
-import FilePie from './assets/pie.json'
-import FileMixed from './assets/mixed.json'
-import FileDoughnut from './assets/doughnut.json'
-import FileStatusOk from './assets/status-ok.json'
-import FileStatusFail from './assets/status-fail.json'
-import FileStatusMixed from './assets/status-mixed.json'
 import FileRoom1 from './assets/room1.json'
 import FileRoom2 from './assets/room2.json'
 import FileRoom3 from './assets/room3.json'
@@ -98,25 +95,32 @@ export default {
   },
   data() {
     return {
-      dataBar: FileBar,
-      dataPie: FilePie,
-      dataMixed: FileMixed,
-      dataDoughtnut: FileDoughnut,
+      colorNone: 'rgba(255, 99, 132, 0.0)',
+      backgroundColor: [
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(255, 119, 74, 0.2)',
+        'rgba(255, 205, 86, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(153, 102, 255, 0.2)',
+        'rgba(201, 203, 207, 0.2)'
+      ],
+      borderColor: [
+        'rgb(255, 99, 132)',
+        'rgb(255, 159, 64)',
+        'rgb(255, 205, 86)',
+        'rgb(75, 192, 192)',
+        'rgb(54, 162, 235)',
+        'rgb(153, 102, 255)',
+        'rgb(201, 203, 207)'
+      ],
       simuStatus: 'success',
       rooms: [],
-      resolvedIncidentsCount: 0,
+      completedTasksCount: 0,
       isSimulating: false,
-      dataStatusMixed: FileStatusMixed,
-      /*[
-        { text: 'one', type: 'danger' },
-        { text: 'two', type: 'info' },
-        { text: 'three', type: 'success' },
-        { text: 'four', type: 'warning' }
-      ]*/
-      lineOptions: {
+      latencyOptions: {
         title: {
-          display: true,
-          text: 'Line Chart'
+          display: false
         },
         scales: {
           yAxes: [
@@ -124,38 +128,27 @@ export default {
               ticks: {
                 //min: 0,
                 //max: 300,
-                //stepSize: 100,
+                stepSize: 5
                 //reverse: true
                 //beginAtZero: true
               }
             }
           ]
-        }
-      },
-
-      horizontalOptions: {
-        title: {
-          display: true,
-          text: 'Another Bar Chart'
-        },
-        indexAxis: 'y',
-        legend: {
-          display: false
         },
         responsive: true,
-        maintainAspectRatio: true
+        maintainAspectRatio: false
       },
-
-      barOptions: {
+      powerConsumptionOptions: {
         title: {
-          display: true,
-          text: 'Bar Chart'
+          display: false
         },
         scales: {
           yAxes: [
             {
+              stacked: true,
               ticks: {
-                beginAtZero: true
+                beginAtZero: true,
+                stepSize: 0.5
               },
               gridLines: {
                 display: true
@@ -164,6 +157,7 @@ export default {
           ],
           xAxes: [
             {
+              stacked: true,
               gridLines: {
                 display: false
               }
@@ -176,12 +170,25 @@ export default {
         responsive: true,
         maintainAspectRatio: false
       },
-
-      pieOptions: {
+      maintenanceOptions: {
         title: {
-          display: true,
-          text: 'Pie Chart'
-        }
+          display: false
+        },
+        legend: {
+          display: true
+        },
+        responsive: true,
+        maintainAspectRatio: false
+      },
+      activeDevicesOptions: {
+        title: {
+          display: false
+        },
+        legend: {
+          display: true
+        },
+        responsive: true,
+        maintainAspectRatio: false
       }
     }
   },
@@ -205,8 +212,151 @@ export default {
       })
       return total + ' pcs'
     },
-    resolvedIncidents() {
-      return this.resolvedIncidentsCount + ' pcs'
+    completedTasks() {
+      return this.completedTasksCount + ' pcs'
+    },
+    activeDevicesData() {
+      if (this.rooms.length === 3) {
+        let data = {
+          labels: [this.rooms[0].name, this.rooms[1].name, this.rooms[2].name],
+          datasets: [
+            {
+              data: [this.rooms[0].activeDevices, this.rooms[1].activeDevices, this.rooms[2].activeDevices],
+              backgroundColor: [this.backgroundColor[5], this.backgroundColor[1], this.backgroundColor[4]],
+              borderColor: [this.borderColor[5], this.borderColor[1], this.borderColor[4]],
+              hoverOffset: 4,
+              borderWidth: 1
+            }
+          ]
+        }
+        return data
+      }
+      return {}
+    },
+    latencyData() {
+      if (this.rooms.length === 3) {
+        let d = new Date()
+        let h = d.getHours()
+        let m = d.getMinutes()
+        let labels = []
+        for (let i = 0; i < this.rooms[0].latency.length; i++) {
+          d.setMinutes(m - 10)
+          m = d.getMinutes()
+          labels.push(h.toString() + ':' + (m < 10 ? '0' : '') + m.toString())
+        }
+        let data = {
+          labels: labels.reverse(),
+          datasets: [
+            {
+              label: this.rooms[0].name,
+              data: this.rooms[0].latency,
+              backgroundColor: this.colorNone,
+              borderColor: this.borderColor[5],
+              hoverOffset: 4,
+              borderWidth: 1
+            },
+            {
+              label: this.rooms[1].name,
+              data: this.rooms[1].latency,
+              backgroundColor: this.colorNone,
+              borderColor: this.borderColor[2],
+              hoverOffset: 4,
+              borderWidth: 1
+            },
+            {
+              label: this.rooms[2].name,
+              data: this.rooms[2].latency,
+              backgroundColor: this.colorNone,
+              borderColor: this.borderColor[4],
+              hoverOffset: 4,
+              borderWidth: 1
+            }
+          ]
+        }
+        return data
+      }
+      return {}
+    },
+    maintenanceData() {
+      if (this.rooms.length === 3) {
+        let deviceDataset = []
+        let labels = []
+        this.rooms.forEach((room, i) => {
+          labels.push(room.name)
+
+          room.devices.forEach((device, i) => {
+            let dev = deviceDataset.find((d) => d.label === device.name)
+            if (dev) {
+              dev.data.push(device.maintenanceHours)
+            } else {
+              deviceDataset.push({
+                type: 'bar',
+                label: device.name,
+                backgroundColor: this.backgroundColor[i],
+                borderColor: this.borderColor[i],
+                data: [device.maintenanceHours],
+                borderWidth: 1
+              })
+            }
+          })
+        })
+        let data = {
+          labels: labels,
+          datasets: deviceDataset
+        }
+
+        return data
+      }
+      return {}
+    },
+    powerConsumptionData() {
+      if (this.rooms.length === 3) {
+        let d = new Date()
+        let h = d.getHours()
+        let m = d.getMinutes()
+        let labels = []
+        for (let i = 0; i < this.rooms[0].powerConsumption.length; i++) {
+          d.setHours(h - 1)
+          h = d.getHours()
+          labels.push(h.toString() + ':' + (m < 10 ? '0' : '') + m.toString())
+        }
+        let data = {
+          labels: labels.reverse(),
+          scales: {
+            x: {
+              stacked: true
+            },
+            y: {
+              stacked: true
+            }
+          },
+          datasets: [
+            {
+              backgroundColor: this.backgroundColor[5],
+              borderColor: this.borderColor[5],
+              borderWidth: 1,
+              label: this.rooms[0].name,
+              data: this.rooms[0].powerConsumption
+            },
+            {
+              backgroundColor: this.backgroundColor[1],
+              borderColor: this.borderColor[1],
+              borderWidth: 1,
+              label: this.rooms[1].name,
+              data: this.rooms[1].powerConsumption
+            },
+            {
+              backgroundColor: this.backgroundColor[4],
+              borderColor: this.borderColor[4],
+              borderWidth: 1,
+              label: this.rooms[2].name,
+              data: this.rooms[2].powerConsumption
+            }
+          ]
+        }
+        return data
+      }
+      return {}
     }
   },
   mounted() {
@@ -230,7 +380,9 @@ export default {
       let k = Math.floor(Math.random() * 3)
 
       this.rooms[i].statuslist[j].status = ['danger', 'success', 'warning'][k]
-      if (this.rooms[i].statuslist[j].status === 'success') this.resolvedIncidentsCount++
+      if (this.rooms[i].statuslist[j].status === 'success') this.completedTasksCount++
+
+      this.rooms[j].activeDevices += Math.max(Math.round(Math.random()) * 3 - 1, 0)
       if (this.isSimulating) setTimeout(this.simulateRandom, 300)
     },
     fillData() {
@@ -251,11 +403,12 @@ export default {
     simulateSuccess() {
       this.isSimulating = false
       this.rooms.forEach((room) => {
+        room.activeDevices = 2
         room.statuslist
           .filter((status) => status.status !== 'success')
           .forEach((status) => {
             status.status = 'success'
-            this.resolvedIncidentsCount++
+            this.completedTasksCount++
           })
       })
     },

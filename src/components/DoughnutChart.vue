@@ -1,9 +1,9 @@
 <script>
-import { Doughnut, Pie, mixins } from 'vue-chartjs'
+import { PolarArea, Pie, mixins } from 'vue-chartjs'
 const { reactiveProp } = mixins
 
 export default {
-  extends: Doughnut,
+  extends: PolarArea,
   mixins: [reactiveProp],
   props: {
     chartData: {
